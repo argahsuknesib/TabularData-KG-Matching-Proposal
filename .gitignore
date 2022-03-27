@@ -6,3 +6,9 @@
 *.log
 *.synctex.gz
 *.bst
+samplepaper.fls
+samplepaper.aux
+samplepaper.fdb_latexmk
+samplepaper.fls
+samplepaper.log
+samplepaper.synctex.gz
