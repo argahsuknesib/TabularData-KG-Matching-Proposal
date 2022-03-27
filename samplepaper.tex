@@ -68,7 +68,7 @@ When a tabular data is presented, we face multiple problems such as the followin
 
 As we can have heterogenous data from different sources, one improvement can be find the type of the column and arrange columns with similar types together.
 This will result in a generalized structure useful when we will be coding the KG. 
-To counter the problem of lack of metadata while processing the data from tables. One approach could be to search for the the item on wikidata, DBPedia and if 
+To counter the problem of lack of metadata while processing the data from tables. One approach could be to search for the the item on wikidata, DBpedia and if 
 it exists, using the data entered there to add into the KG.
 To counter the problem of noise in the data, we can use levenshtein distance to find the closest word, if there is a misspelling. We can also 
 use a word similarity index calculator with preexisting language models like BERT. If the KG to generate is a in a specific domain, and we have a 
@@ -77,15 +77,15 @@ was not originally present but is generated, for example can use a vocabulary co
 Domain experts in the knowledge graph can identify the mistakes and correct them. We as computer scientists, can not correct. We can make a relation
 to make it easily queryable with SPARQL by adding a blank node []. (e.g ex:Item1 ex:needsReview [])
 There can be entries with short labels (like abbreviations), which can be corrected either with domain experts/maintainer of the KG or by voting among the users of the KG 
-or by checking if there is an alias similar on WikiData or DBPedia.
+or by checking if there is an alias similar on WikiData or DBpedia.
 
 \subsubsection*{Data Generation}
 
-The paper uses only English DBPedia, instead of which one can use as many KGs we need to extract and generate data. We can add references to the data generated
+The paper uses only English DBpedia, instead of which one can use as many KGs we need to extract and generate data. We can add references to the data generated
 from a specific KG. We won't have to process as many RDF data dumps as before and more data will be generated as the goal is to have more meaningful
 data.
 
-For generation of raw table data, we will write much more SPARQL queries for each dataset being used (e.g DBPedia and Wikidata). I am an advocate for 
+For generation of raw table data, we will write much more SPARQL queries for each dataset being used (e.g DBpedia and Wikidata). I am an advocate for 
 decentralized systems and if knowledge on a specific dataset is compromised by let's say an acquisation by BigTech companies, the Knowledge should be free.
 Thus references with multiple datasets will be beneficial.
 
