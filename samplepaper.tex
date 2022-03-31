@@ -129,9 +129,147 @@ the type of property we wish to extract, for example if you wish to get date the
 other datatype. This might help us to filter out the data which don't have a the required value linked with them. One can discard all the other
 values or maybe store for other usecases to check the accuracy of this approach. 
 
-\section{Conclusion}
-A proposal for generation of knowledge graph from tabular data is proposed along with methods for matching. The proposal can not have a definitive conclusion
-to application as there were no experiments conducted in this case.
+\section{Existing Approaches}
+The sections describe the different papers entered in the competition. Some general modifications which I would 
+propose in every apporoach will be,
+\begin{itemize}
+    \item Adding data from multiple sources, and being generalized enough to introduce a new source at any point of time.
+    \item Querying the original KG after a specific time, to check and infer a new knowledge or a change in knowledge, if any.
+    \item Providing a reasoning logic in generation, if the same label provides different values when we go through different KGs.
+    \item If we are using a KG or several KGs, reasoning logic to define the ground truth is important if we wish to take feedback and enhance with machine learning and deep learning models.
+\end{itemize}
+Specific merits and demerits I found in the papers are disucssed in the subsections,
+\subsection{ADOG : Anotating Data with Ontologies and Graphs}
+\subsubsection{Merits}
+\begin{itemize}
+    \item Unfortunately, I would not add anything to the system I would make if I had to make, from this paper.
+\end{itemize}
+\subsubsection{Demerits}
+\begin{itemize} 
+    \item I don't think this is a good approach, because we would like the knowledge graph to be generated from the CSV
+    \item I would like to find a method to find relations between the columns automatically than predefining the schema by myself.
+    \item They also said to make the KG not dependant on one single source, but they are only using DBPedia now.
+    \item It would be interesting if we could see a multi-source system.
+    \item Very minimal preprocessing of the data.
+    \item No discussion if the property/new column type entered or present in the table is not present already in the defined and loaded ontology file.
+\end{itemize}
+\subsection{CSV2KG : Transforming Tabular Data into Semantic Knowledge}
+\subsubsection*{Merits}
+\begin{itemize}
+    \item The column inference heuristic logic with majority voting employing the hierarchy of DBPedia ontology
+    \item Choosing voting as well as counting/preferring the majority of the results as the final decision.
+    \item Employing reasoning to find equivalent classes and column types.
+\end{itemize}
+\subsubsection*{Demerits}
+\begin{itemize}
+    \item The column type annotation is not considering irregular data, for example if in a column (of 20 entries) you have 15 with one context and 5 irregular, or out of context data. You need to set a threshold, by finding the datatype of every entity, and with threshold compute the actual type of the column. If possible, remove the outliers to a different column and add them with a different type into the KG.
+    \item As everything happens step by step, and the steps are dependant on one another, if one fails the KG generated will not be good. Thus, it can be improved by making a check that if step 2 is executed fully and correctly we move towards step 3.
+\end{itemize}
+\subsection{Entity Linking to Knowledge Graphs to Infer Column Types and Properties}
+\subsubsection*{Merits}
+\begin{itemize}
+    \item The candidate generation and selection method approach was very good. 
+    \item They have employed a neural network to learn weights and relatinships from labeled data to rank the entities. (which will be interesting to see how 
+    we can work with neural networks in a context-free table to KG generation, as in most of the tables we are not sure if there will be
+    entites on wikidata or if there will be a metadata to work with. If a neural network is trained, it can classify the entities and columns with properties and classes.
+     I am not sure if this approach has been implemented already.)
+    \item The model ranking system in the entity is also employed for deciding the column property and column type.
+    \item They have targeted the two major KGs, DBPedia and Wikidata.
+\end{itemize}
+\subsubsection*{Demerits}
+\begin{itemize}
+    \item The ground truth (one for each KG i.e. one for wikidata and one for DBPedia and beyond) for training the ranking algorithm is not implemented.
+    \item The entities who are discrarded in the candidate generation process are not considered beyond, maybe they were domain specific and not in WikiData/DBPedia.
+\end{itemize}
+A note that, if I had to build a system for KG generation from context-free tables, I will build upon this approach. Although, I am not very sure because there could be better papers,
+I did not do enough literature review!
+\subsection{MantisTable: An automatic approach for the Semantic Table Interpretation} 
+The paper identifies the limit of the state of the art of being reliant on the metadata. The paper follows with, "MantisTable takes a well-formed and a normalized relational table" which is a
+bit misleading as if the current limitation is reliance on metadata, and then taking a regular normalized table to solve the problem is not very beneficial. Metadata is important to understand the structure.
+RDF is a very powerful tool for metadata, and it is very important to understand the structure of the metadata. I am not sure how can we say that reliance on metadata is wrong, if we have a context-free table 
+metadata can actually help us to infer the structure of the table.
+
+\subsubsection*{Merits}
+\begin{itemize}
+    \item The data preparation approach is good as it considers different units a value can have, rather than classifying them into the same table-type as 'units/values'. We will get
+    more meaning out of the data. 
+    \item The column analysis is assigning the columns into named-entity, literal and subject column which is a good approach, but what if we have multiple subject columns with the same property and different object values. I am not sure how the existing approach will handle it.
+    \item For the concept and datatype annotation is good, it will also be nice using the ranking based model for it would be even better as instead of counting the number of rows in the table it uses the ontology present at Wikidata/DBPedia. I am not sure which one would perform better.
+\end{itemize}
+\subsubsection*{Demerits}
+\begin{itemize}
+    \item The detection of a subject cell is dependant on the fraction of empty cells, average number of words in the cells, which is oddly specific and will not be scalable for tables out of the scope of the challenge.
+    \item The approach in the first rounds was to consider the entities for which, within the values of \textit{rdf:type}.
+    \item They only identify one class per column.
+\end{itemize}
+\subsection{MAGIC: Mining an Augmented Graph using INK, starting from a CSV}
+\subsubsection*{Merits}
+\begin{itemize}
+    \item The approach employing INK is very good, as it employs existing KGs to do entity, type and property annotation at the same time. I like that it concatenates the relations 
+    on a path from all the other nodes on the path. You can also use the relations from each path to do node classification if you wished to, I think this approach would help us if we find let's say
+    information about the entities, and then with that information define a threshold to classify the column type or as we are able to identify the node, we can extract similar nodes 
+    and place them in a different column.
+    \item It can also provide the additional information available with the KG it is infering from.
+    \item INK technique can also query locally stored Knowledge Graphs. 
+    \item It takes notice that there could be a case where the 'main column' is not defined, and thus the method works accordingly.
+    \item They are employing HDT to save space (my labmate is working with HDT in his PhD thesis!)
+    \item MAGIC approach can be adapted to any other KG as well. (something that I would like it to have.)
+    \item 
+\end{itemize}
+\subsubsection*{Demerits}
+\begin{itemize}
+    \item Very few demerits, although if there was some reasoning logic employed in candidate selection, it would've been better.
+    \item They did not declare what will happen for cases where the entity finds no match in either WikiData or DBPedia.
+    \item Implementing WordNet and/or levenshtein distance will be great and improve the approach.
+\end{itemize}
+I would chose this paper too, to build upon a Tablular Data to KG matching platform.
+\subsection{DAGOBAH : An End-to-End Context-Free Tabular Data Semantic Annotation System}
+\subsubsection*{Merits}
+\begin{itemize}
+    \item Implements a method based upon primitive cell typing system to find out if the table is horizontal or vertical.
+    \item They have implemented querying from 5 different services, than just one or two in other approaches. Although, they are changing the QIDs to DBPedia ones, which they prefer. 
+    \item The elasticsearch server implemented, is good to add the aliases, but they could have been added by running a SPARQL query with \textit{skos:altLabel} as well.
+    \item They have implemented K-means algorithm which is good to classify the wikidata embeddings, but I am not sure if it is a good/bad approach as they only tested with one dataset, the results could change with other datasets. 
+\end{itemize}
+\subsubsection*{Demerits}
+\begin{itemize}
+    \item Only dependant on Wikidata, thus not scalable.
+    \item The header extracter, assumes that the header will not share the type of the column involved, but I think it is bad for tables who just have string values embedded into them. The preprocessing method is rather specific to the data presented, and not very generalized.
+\end{itemize}
+\subsection{MTab : Matching Tabular Data to Knowledge Graph using Probability Methods}
+\subsubsection*{Merits}
+\begin{itemize}
+    \item They implemented lookup services for multilingual data, and used a fasttext NLP model to predict the language of each entity.
+    \item Approach to solve the problem of preference, when there are multiple KGs to lookup from is implemented, with entity candidate estimation which is good.
+    \item It is considering both entity-entity and entity-non entity column relation.
+    \item 
+\end{itemize}
+
+\subsubsection*{Demerits}
+\begin{itemize}
+    \item The assumptions laid out before explaining the approach makes the system too case specific and not generalized as we would prefer in an automatic KG generation from tabular data format.
+    \item They are not matching the entity, but due to one assumption, using reasoning to find a relation, which in my opinion is not great.
+    \item Assumption to find the type of column, and then doing majority voting on it, which is good when there are different types of data.
+    \item They claim that it is not solvable for a realtime application (which is mostly the usecase) which can be improved and adapted.
+\end{itemize}
+\subsection{JenTab: A Toolkit for Semantic Table Annotations}
+\subsubsection*{Merits}
+\begin{itemize}
+    \item It is a very good thing to remove the cell entities which do not belong to the shared selected column type. It is a strong point of the paper that it is doing the CEA/CTA/CPA simultaneously and infering the knowledge from a process to improve another annotation. 
+    \item The cells which do not have a return value from a lookup into an existing KG are not left un-annotated or discarded but the are assigned the knowledge one infers from row and column contexts.
+    \item System architectural benefits such as caching and different nodes to execute different services in a distributed fashion.
+    \item They have a ground truth they build up the model upon.
+    \item They employ SearX to lookup, which does lookup more than 80 engines. 
+    \item The preprocessing employed is good to eliminate noise, if there is introduced in the tabular data. The lexographic challenges are also handled when looking up entities in a preexisting KG. 
+    \item They are employing majority voting in Column Property and Type annotation.
+    \item The classification of object, date, string and quantity as shown in the confusion matrix can be employed to train a model to improve the classification and annotation's accuracy further.
+\end{itemize}
+
+\subsubsection*{Demerits}
+\begin{itemize}
+    \item The suppport different date-time format, which is good but can be troublesome while querying a generated KG from the tabular data. In my opinion, all time should be preprocessed and converted to Unix timestamp and after that one can convert in the postlookup by a SPARQL query.
+    \item String values which have an overlap of atleast 50 \% are considered a match, but I think employing levenshtein distance is a better approach. They have employed levenshtein distance in the selection of an annotation, but I think it would be better in the creation of the entities.
+\end{itemize}
 
 
 \end{document}
